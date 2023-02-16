@@ -10,7 +10,7 @@ import {
 dotenv.config();
 
 const locationTableName: string = 'Location';
-const openStreetmapsUrl: string = 'https://nominatim.openstreetmap.org/search';
+const openStreetmapsUrl: string = 'https://nominatim.openstreetmap.org';
 const devStageName: string = process.env.CUSTOM_STAGE || Stage.dev;
 
 export const environments: Record<Stage, EnvironmentConfig> = {

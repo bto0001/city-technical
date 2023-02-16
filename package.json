@@ -8,7 +8,11 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "deploy:pipeline": "cdk deploy CityTechnical",
+    "remove:pipeline": "cdk destroy CityTechnical",
+    "deploy:dev": "cdk deploy CityTechnical/Develop-dev/StatefulStack CityTechnical/Develop-dev/StatelessStack",
+    "remove:dev": "cdk destroy CityTechnical/Develop-dev/StatefulStack CityTechnical/Develop-dev/StatelessStack"
   },
   "devDependencies": {
     "@aws-lambda-powertools/commons": "^1.5.1",

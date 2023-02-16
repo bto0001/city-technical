@@ -23,7 +23,7 @@ export class StatefulStack extends cdk.Stack {
       contributorInsightsEnabled: true,
       removalPolicy: RemovalPolicy.DESTROY,  // parameterize so that DESTROY is not used in prod
       partitionKey: {
-        name: 'Id',  // combination of 'city#state#country' to prevent duplicate entries
+        name: 'Id',  // combination of 'country_state_city' with no spaces to prevent duplicate entries
         type: dynamodb.AttributeType.STRING,
       },
     });

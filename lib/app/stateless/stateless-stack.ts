@@ -91,7 +91,10 @@ export class StatelessStack extends cdk.Stack {
       },
       environment: {
         LOCATION_TABLE_NAME: table.tableName,
-        OPENSTEETMAP_URL: props.openStreetMapsUrl
+        OPENSTEETMAP_URL: props.openStreetMapsUrl,
+        POWERTOOLS_SERVICE_NAME: 'GetAllLocationsLambda',
+        POWERTOOLS_LOGGER_LOG_EVENT: 'true',
+        LOG_LEVEL: props.logLevel
       }
     });
 
@@ -107,7 +110,10 @@ export class StatelessStack extends cdk.Stack {
       },
       environment: {
         LOCATION_TABLE_NAME: table.tableName,
-        OPENSTEETMAP_URL: props.openStreetMapsUrl
+        OPENSTEETMAP_URL: props.openStreetMapsUrl,
+        POWERTOOLS_SERVICE_NAME: 'GetLocationLambda',
+        POWERTOOLS_LOGGER_LOG_EVENT: 'true',
+        LOG_LEVEL: props.logLevel
       }
     });
 
@@ -123,8 +129,11 @@ export class StatelessStack extends cdk.Stack {
       },
       environment: {
         LOCATION_TABLE_NAME: table.tableName,
-        OPENSTEETMAP_URL: props.openStreetMapsUrl
-      }
+        OPENSTEETMAP_URL: props.openStreetMapsUrl,
+        POWERTOOLS_SERVICE_NAME: 'UpdateLocationLambda',
+        POWERTOOLS_LOGGER_LOG_EVENT: 'true',
+        LOG_LEVEL: props.logLevel
+      },
     });
 
     // connect lambdas with api gateway

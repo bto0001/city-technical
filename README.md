@@ -13,6 +13,22 @@ npm run deploy:dev
 
 ## Design Considerations
 
+### Database Design
+
+The Location table is a DynamoDB table with the following schema:
+
+- Id (String): Partition Key consisting of 'country_state_city' with spaces removed to prevent duplication of records
+- Name (String): a user-friendly name chosen, does not need to be unique
+- City (String)
+- State (String)
+- Country (String)
+- Latitude (String)
+- Longitude (String)
+
+Latitude and Longitude are provided via an external API call to  https://nominatim.openstreetmap.org.
+
+City, State, and Country values will be parsed from the openstreetmap.org call and stored as opposed to using the user-provided values to prevent duplication.
+
 ### API Design
 
 I decided to use the route 'locations/' as the main route, using the HTTP verbs to denote what the endpoint does. Here are the routes:
@@ -20,7 +36,7 @@ I decided to use the route 'locations/' as the main route, using the HTTP verbs 
 - GET   - locations/: retrieve all locations
 - GET   - locations/{id}: retrieve one location with a given id
 - POST  - locations/: create a new location
-- PATCH - locations/{id}: update a location with a given id in the path parameter
+- PATCH - locations/{id}: update a location with a given id in the path parameter. Currently, this API only allows for location name, latitude, and longitude to be overwritten. I should've asked for clarification on this point sooner, but my reasoning is this: since the partition key consists of 'country_state_city' and I'm initially using an external API for coordinates, I'm allowing users to overwrite the coordinates with their own values if need be and they can rename their location.
 
 Perhaps a more DDD approach would've been to create separate endpoints, for example:
 
@@ -29,27 +45,14 @@ Perhaps a more DDD approach would've been to create separate endpoints, for exam
 - GET   - location/get
 - GET   - location/get-all
 
-### Database Design
-
-The Location table is a DynamoDB table with the following schema:
-
-- Id (String): Partition Key consisting of 'city#state#country' to prevent duplication of records
-- Name (String): a user-friendly name chosen, does not need to be unique
-- City (String)
-- State (String)
-- Country (String)
-- Latitude (Number)
-- Longitude (Number)
-
-Latitude and Longitude are provided via an external API call to  https://nominatim.openstreetmap.org.
-
-City, State, and Country values will be parsed from the openstreetmap.org call and stored as opposed to using the user-provided values to prevent duplication.
-
 ## Improvements
 
 - Add integration, E2E testing, and smoke/verification testing
 - Add more unit tests
 - Use a Global Table (multi-region replication) instead of the one, regional table
+- Add pagination for results to the getAll functionality
+- More error handling and custom errors
+- Add request validation
 - Consider using Edge Optimized endpoints for geographically distributed clients
 - Configure WAF to protect the endpoints
 - Consider using a DI library
