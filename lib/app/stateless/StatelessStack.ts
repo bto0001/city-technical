@@ -10,6 +10,7 @@ export interface StatelessStackProps extends cdk.StackProps {
   table: dynamodb.Table;
   stageName: string;
   lambdaMemorySize: number;
+  logLevel: string;
 }
 
 export class StatelessStack extends cdk.Stack {
@@ -19,6 +20,8 @@ export class StatelessStack extends cdk.Stack {
     super(scope, id, props);
 
     const { table, stageName } = props;
+
+    const projectRoute: string = path.resolve(__dirname, '..', '..', '..');  // not the most elegant code
 
     // create rest api
     const locationsApi: apigw.RestApi = new apigw.RestApi(this, 'LocationsApi', {
@@ -38,10 +41,27 @@ export class StatelessStack extends cdk.Stack {
     const locationsWithIdResource: apigw.Resource = locationsResource.addResource('{id}');
 
     // create lambdas
+    const healthCheckLambda: nodeLambda.NodejsFunction = new nodeLambda.NodejsFunction(this, 'HealthCheckLambda', {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      entry: './src/handlers/healthCheck.ts',
+      projectRoot: projectRoute,
+      memorySize: props.lambdaMemorySize,
+      handler: 'handler',
+      bundling: {
+        minify: true,
+        externalModules: ['@aws-sdk/client-dynamodb']
+      },
+      environment: {
+        // Used by AWS Lambda Powertools
+        LOG_LEVEL: props.logLevel,
+        POWERTOOLS_SERVICE_NAME: 'HealthCheckLambda'
+      }
+    });
+
     const createLocationLambda: nodeLambda.NodejsFunction = new nodeLambda.NodejsFunction(this, 'CreateLocationLambda', {
       runtime: lambda.Runtime.NODEJS_18_X,
       entry: './src/handlers/createLocation.ts',
-      projectRoot: path.resolve(__dirname, '..', '..', '..'),  // not the most elegant code
+      projectRoot: projectRoute,
       memorySize: props.lambdaMemorySize,
       handler: 'handler',
       bundling: {
@@ -49,14 +69,17 @@ export class StatelessStack extends cdk.Stack {
         externalModules: ['@aws-sdk/client-dynamodb']
       },
       environment: {
-        LOCATION_TABLE_NAME: table.tableName
+        LOCATION_TABLE_NAME: table.tableName,
+        POWERTOOLS_SERVICE_NAME: 'CreateLocationLambda',
+        POWERTOOLS_LOGGER_LOG_EVENT: 'true',
+        LOG_LEVEL: props.logLevel
       }
     });
 
-    const getAllLocationsLambda: nodeLambda.NodejsFunction = new nodeLambda.NodejsFunction(this, 'getLocationLambda', {
+    const getAllLocationsLambda: nodeLambda.NodejsFunction = new nodeLambda.NodejsFunction(this, 'GetAllLocationsLambda', {
       runtime: lambda.Runtime.NODEJS_18_X,
       entry: './src/handlers/getAllLocations.ts',
-      projectRoot: path.resolve(__dirname, '..', '..', '..'),
+      projectRoot: projectRoute,
       memorySize: props.lambdaMemorySize,
       handler: 'handler',
       bundling: {
@@ -68,10 +91,10 @@ export class StatelessStack extends cdk.Stack {
       }
     });
 
-    const getLocationLambda: nodeLambda.NodejsFunction = new nodeLambda.NodejsFunction(this, 'getLocationLambda', {
+    const getLocationLambda: nodeLambda.NodejsFunction = new nodeLambda.NodejsFunction(this, 'GetLocationLambda', {
       runtime: lambda.Runtime.NODEJS_18_X,
       entry: './src/handlers/getLocation.ts',
-      projectRoot: path.resolve(__dirname, '..', '..', '..'),
+      projectRoot: projectRoute,
       memorySize: props.lambdaMemorySize,
       handler: 'handler',
       bundling: {
@@ -83,10 +106,10 @@ export class StatelessStack extends cdk.Stack {
       }
     });
 
-    const updateLocationLambda: nodeLambda.NodejsFunction = new nodeLambda.NodejsFunction(this, 'updateLocationLambda', {
+    const updateLocationLambda: nodeLambda.NodejsFunction = new nodeLambda.NodejsFunction(this, 'UpdateLocationLambda', {
       runtime: lambda.Runtime.NODEJS_18_X,
       entry: './src/handlers/updateLocation.ts',
-      projectRoot: path.resolve(__dirname, '..', '..', '..'),
+      projectRoot: projectRoute,
       memorySize: props.lambdaMemorySize,
       handler: 'handler',
       bundling: {

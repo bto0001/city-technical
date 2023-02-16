@@ -2,25 +2,26 @@ import {
   APIGatewayEvent,
   APIGatewayProxyHandler,
   APIGatewayProxyResult,
+  Context
 } from 'aws-lambda';
 import { Logger } from '@aws-lambda-powertools/logger';
-import { v4 as uuid } from 'uuid';
+
+const log = new Logger();
 
 export const handler: APIGatewayProxyHandler = async (
-  event: APIGatewayEvent
+  _: APIGatewayEvent,
+  context: Context
 ): Promise<APIGatewayProxyResult> => {
   try {
-    const correlationId = uuid();
-    const method = 'healthCheck.handler';
-    const prefix = `${correlationId} - ${method}`;
+    log.addContext(context);
 
-    console.log(`${prefix} - success`);
+    log.debug('inside healthCheck');
     return {
       statusCode: 200,
       body: JSON.stringify('success'),
     };
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
+    log.error(error);
     throw error;
   }
 };

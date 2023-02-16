@@ -17,7 +17,8 @@ export class PipelineStage extends cdk.Stage {
     const statelessStack = new StatelessStack(this, 'StatelessStack', {
       table: statefulStack.table,
       lambdaMemorySize: props.stateless.lambdaMemorySize,
-      stageName: props.stageName
+      stageName: props.stageName,
+      logLevel: props.stateless.logLevel
     });
 
     this.apiEndpointUrl = statelessStack.apiEndpointUrl;

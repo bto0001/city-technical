@@ -9,8 +9,8 @@ import {
 
 dotenv.config();
 
-const locationTableName = 'Location';
-const devStageName = process.env.CUSTOM_STAGE || Stage.dev;
+const locationTableName: string = 'Location';
+const devStageName: string = process.env.CUSTOM_STAGE || Stage.dev;
 
 export const environments: Record<Stage, EnvironmentConfig> = {
   [Stage.dev]: {
@@ -23,7 +23,9 @@ export const environments: Record<Stage, EnvironmentConfig> = {
       locationTableName: `${devStageName}-${locationTableName}`,
     },
     stateless: {
-      lambdaMemorySize: parseInt(process.env.LAMBDA_MEMORY_SIZE || '128')
+      lambdaMemorySize: parseInt(process.env.LAMBDA_MEMORY_SIZE || '128'),
+      logLevel: process.env.LOG_LEVEL || 'DEBUG',
+      logEvent: true
     }
   },
   [Stage.qa]: {
@@ -36,7 +38,9 @@ export const environments: Record<Stage, EnvironmentConfig> = {
       locationTableName: locationTableName,
     },
     stateless: {
-      lambdaMemorySize: 256
+      lambdaMemorySize: 256,
+      logLevel: 'DEBUG',
+      logEvent: true
     }
   },
   [Stage.staging]: {
@@ -49,7 +53,9 @@ export const environments: Record<Stage, EnvironmentConfig> = {
       locationTableName: locationTableName,
     },
     stateless: {
-      lambdaMemorySize: 512
+      lambdaMemorySize: 512,
+      logLevel: 'INFO',
+      logEvent: false
     }
   },
   [Stage.prod]: {
@@ -62,7 +68,9 @@ export const environments: Record<Stage, EnvironmentConfig> = {
       locationTableName: locationTableName,
     },
     stateless: {
-      lambdaMemorySize: 1024
+      lambdaMemorySize: 1024,
+      logLevel: 'WARN',
+      logEvent: false
     }
   }
 }

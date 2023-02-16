@@ -9,6 +9,8 @@ export interface EnvironmentConfig {
   };
   stateless: {
     lambdaMemorySize: number;
+    logLevel: string;
+    logEvent: boolean;
   }
 }
 
