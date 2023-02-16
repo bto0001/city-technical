@@ -11,6 +11,7 @@ export interface EnvironmentConfig {
     lambdaMemorySize: number;
     logLevel: string;
     logEvent: boolean;
+    openStreetmapsUrl: string;
   }
 }
 
@@ -27,7 +28,7 @@ export const enum Stage {
 }
 
 export const enum Account {
-  qa = '11111111111',
-  staging = '22222222222',
-  prod = '33333333333'
+  qa = '245348667868',
+  staging = '222222222222',
+  prod = '333333333333'
 }

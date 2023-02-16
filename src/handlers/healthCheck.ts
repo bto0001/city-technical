@@ -18,7 +18,7 @@ export const handler: APIGatewayProxyHandler = async (
     log.debug('inside healthCheck');
     return {
       statusCode: 200,
-      body: JSON.stringify('success'),
+      body: 'success',
     };
   } catch (error: any) {
     log.error(error);

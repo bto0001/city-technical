@@ -8,6 +8,7 @@ import { Construct } from 'constructs';
 
 export interface StatelessStackProps extends cdk.StackProps {
   table: dynamodb.Table;
+  openStreetMapsUrl: string;
   stageName: string;
   lambdaMemorySize: number;
   logLevel: string;
@@ -15,6 +16,7 @@ export interface StatelessStackProps extends cdk.StackProps {
 
 export class StatelessStack extends cdk.Stack {
   public readonly apiEndpointUrl: cdk.CfnOutput;  // share api url with others easily
+  public readonly healthCheckUrl: cdk.CfnOutput;  // share with verification test
 
   constructor(scope: Construct, id: string, props: StatelessStackProps) {
     super(scope, id, props);
@@ -70,6 +72,7 @@ export class StatelessStack extends cdk.Stack {
       },
       environment: {
         LOCATION_TABLE_NAME: table.tableName,
+        OPENSTEETMAP_URL: props.openStreetMapsUrl,
         POWERTOOLS_SERVICE_NAME: 'CreateLocationLambda',
         POWERTOOLS_LOGGER_LOG_EVENT: 'true',
         LOG_LEVEL: props.logLevel
@@ -87,7 +90,8 @@ export class StatelessStack extends cdk.Stack {
         externalModules: ['@aws-sdk/client-dynamodb']
       },
       environment: {
-        LOCATION_TABLE_NAME: table.tableName
+        LOCATION_TABLE_NAME: table.tableName,
+        OPENSTEETMAP_URL: props.openStreetMapsUrl
       }
     });
 
@@ -102,7 +106,8 @@ export class StatelessStack extends cdk.Stack {
         externalModules: ['@aws-sdk/client-dynamodb']
       },
       environment: {
-        LOCATION_TABLE_NAME: table.tableName
+        LOCATION_TABLE_NAME: table.tableName,
+        OPENSTEETMAP_URL: props.openStreetMapsUrl
       }
     });
 
@@ -117,11 +122,17 @@ export class StatelessStack extends cdk.Stack {
         externalModules: ['@aws-sdk/client-dynamodb']
       },
       environment: {
-        LOCATION_TABLE_NAME: table.tableName
+        LOCATION_TABLE_NAME: table.tableName,
+        OPENSTEETMAP_URL: props.openStreetMapsUrl
       }
     });
 
     // connect lambdas with api gateway
+    healthCheckResource.addMethod(
+      'GET',
+      new apigw.LambdaIntegration(healthCheckLambda)
+    );
+
     locationsResource.addMethod(
       'POST',
       new apigw.LambdaIntegration(createLocationLambda)
@@ -153,6 +164,11 @@ export class StatelessStack extends cdk.Stack {
     this.apiEndpointUrl = new cdk.CfnOutput(this, 'ApiEndpointOutput', {
       value: locationsApi.url,
       exportName: `api-endpoint-${props.stageName}`
+    });
+
+    this.healthCheckUrl = new cdk.CfnOutput(this, 'HealthCheckOutput', {
+      value: locationsApi.url,
+      exportName: `healthCheck-endpoint-${props.stageName}`
     });
   };
 }

@@ -21,7 +21,7 @@ export class StatefulStack extends cdk.Stack {
       encryption: dynamodb.TableEncryption.AWS_MANAGED,
       pointInTimeRecovery: false,
       contributorInsightsEnabled: true,
-      removalPolicy: RemovalPolicy.DESTROY,
+      removalPolicy: RemovalPolicy.DESTROY,  // parameterize so that DESTROY is not used in prod
       partitionKey: {
         name: 'Id',  // combination of 'city#state#country' to prevent duplicate entries
         type: dynamodb.AttributeType.STRING,

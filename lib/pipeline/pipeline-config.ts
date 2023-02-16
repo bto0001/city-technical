@@ -10,6 +10,7 @@ import {
 dotenv.config();
 
 const locationTableName: string = 'Location';
+const openStreetmapsUrl: string = 'https://nominatim.openstreetmap.org/search';
 const devStageName: string = process.env.CUSTOM_STAGE || Stage.dev;
 
 export const environments: Record<Stage, EnvironmentConfig> = {
@@ -25,7 +26,8 @@ export const environments: Record<Stage, EnvironmentConfig> = {
     stateless: {
       lambdaMemorySize: parseInt(process.env.LAMBDA_MEMORY_SIZE || '128'),
       logLevel: process.env.LOG_LEVEL || 'DEBUG',
-      logEvent: true
+      logEvent: true,
+      openStreetmapsUrl: openStreetmapsUrl
     }
   },
   [Stage.qa]: {
@@ -40,7 +42,8 @@ export const environments: Record<Stage, EnvironmentConfig> = {
     stateless: {
       lambdaMemorySize: 256,
       logLevel: 'DEBUG',
-      logEvent: true
+      logEvent: true,
+      openStreetmapsUrl: openStreetmapsUrl
     }
   },
   [Stage.staging]: {
@@ -55,7 +58,8 @@ export const environments: Record<Stage, EnvironmentConfig> = {
     stateless: {
       lambdaMemorySize: 512,
       logLevel: 'INFO',
-      logEvent: false
+      logEvent: false,
+      openStreetmapsUrl: openStreetmapsUrl
     }
   },
   [Stage.prod]: {
@@ -70,7 +74,8 @@ export const environments: Record<Stage, EnvironmentConfig> = {
     stateless: {
       lambdaMemorySize: 1024,
       logLevel: 'WARN',
-      logEvent: false
+      logEvent: false,
+      openStreetmapsUrl: openStreetmapsUrl
     }
   }
 }
