@@ -52,7 +52,7 @@ I decided to use the route 'locations/' as the main route, using the HTTP verbs 
 - GET   - locations/: retrieve all locations
 - GET   - locations/{id}: retrieve one location with a given id
 - POST  - locations/: create a new location
-- PATCH - locations/{id}: update a location with a given id in the path parameter. Currently, this API only allows for location name, latitude, and longitude to be overwritten. I should've asked for clarification on this point sooner, but my reasoning is this: since the partition key consists of 'country_state_city' and I'm initially using an external API for coordinates, I'm allowing users to overwrite the coordinates with their own values if need be and they can rename their location.
+- PATCH - locations/{id}: update a location with a given id in the path parameter. Currently, this API only allows for location name, latitude, and longitude to be overwritten. I misread the instructions and realize now that I should've accepted location name, city, state, and country, instead of allowing for latitude an longitude. To prevent duplication, I would need to have this endpoint see if the location id exists, if it does, and the city, state, and/or country properties have been changed, then I need to call the coordinates api for the new lat/long and store that in the Location table. I would also need to delete the previous location id, as it would no longer be valid.
 
 Perhaps a more DDD approach would've been to create separate endpoints, for example:
 
