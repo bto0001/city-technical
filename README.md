@@ -43,7 +43,7 @@ The Location table is a DynamoDB table with the following schema:
 
 Latitude and Longitude are provided via an external API call to  https://nominatim.openstreetmap.org.
 
-City, State, and Country values will be parsed from the openstreetmap.org call and stored as opposed to using the user-provided values to prevent duplication.
+City, State, and Country values will be parsed from the display_name returned from the external coordinates api.
 
 ### API Design
 

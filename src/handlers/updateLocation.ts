@@ -13,7 +13,7 @@ import { CoordinatesRepository } from '../repositories/CoordinatesRepository';
 import { envVars } from '../environmentVars';
 import { LocationRepository } from '../repositories/LocationRepository';
 import { LocationService } from '../LocationService';
-import { UpdateLocationRequest } from '../models/locationRequests';
+import { LocationRequest } from '../models/LocationRequest';
 
 const log = new Logger();
 
@@ -44,7 +44,7 @@ export const handler: APIGatewayProxyHandler = async (
 
     const locationId = event.pathParameters?.id;
 
-    const location: UpdateLocationRequest = JSON.parse(event.body || '');
+    const location: Partial<LocationRequest> = JSON.parse(event.body || '');
 
     if (!locationId) {
       return {

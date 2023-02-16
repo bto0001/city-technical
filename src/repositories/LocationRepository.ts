@@ -1,5 +1,7 @@
 import {
   AttributeValue,
+  DeleteItemCommand,
+  DeleteItemCommandOutput,
   DynamoDBClient,
   GetItemCommand,
   GetItemCommandOutput,
@@ -12,7 +14,6 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { Logger } from '@aws-lambda-powertools/logger';
 
-import { UpdateLocationRequest } from '../models/locationRequests';
 import { LocationItem } from '../models/LocationItem';
 import { ReadAll } from './interfaces/ReadAll';
 import { ReadOne } from './interfaces/ReadOne';
@@ -20,7 +21,7 @@ import { Write } from './interfaces/Write';
 
 const log = new Logger();
 
-export class LocationRepository implements ReadAll<LocationItem>, ReadOne<string, LocationItem>, Write<LocationItem, UpdateLocationRequest> {
+export class LocationRepository implements ReadAll<LocationItem>, ReadOne<string, LocationItem>, Write<LocationItem> {
   constructor(
     private readonly tableName: string,
     private readonly client: DynamoDBClient
@@ -123,24 +124,39 @@ export class LocationRepository implements ReadAll<LocationItem>, ReadOne<string
     };
   }
 
-  public async update(id: string, location: UpdateLocationRequest): Promise<LocationItem> {
+  public async update(id: string, location: Partial<LocationItem>): Promise<LocationItem> {
     let updateExpression = 'SET ';
     let expressionAttributeNames: Record<string, string> = {};
     let expressionAttributeValues: Record<string, AttributeValue> = {};
-    if (location.name) {
+    if (location.Name) {
       updateExpression += '#name = :name,';
       expressionAttributeNames['#name'] = 'Name';
-      expressionAttributeValues[':name'] = { S: location.name };
+      expressionAttributeValues[':name'] = { S: location.Name };
     }
-    if (location.latitude) {
+    if (location.City) {
+      updateExpression += '#city = :city,';
+      expressionAttributeNames['#city'] = 'City'
+      expressionAttributeValues[':city'] = { S: location.City };
+    }
+    if (location.State) {
+      updateExpression += '#state = :state,';
+      expressionAttributeNames['#state'] = 'State';
+      expressionAttributeValues[':state'] = { S: location.State };
+    }
+    if (location.Country) {
+      updateExpression += '#country = :country,';
+      expressionAttributeNames['#country'] = 'Country';
+      expressionAttributeValues[':country'] = { S: location.Country };
+    }
+    if (location.Latitude) {
       updateExpression += '#latitude = :latitude,';
       expressionAttributeNames['#latitude'] = 'Latitude'
-      expressionAttributeValues[':latitude'] = { S: location.latitude };
+      expressionAttributeValues[':latitude'] = { S: location.Latitude };
     }
-    if (location.longitude) {
+    if (location.Longitude) {
       updateExpression += '#longitude = :longitude,';
       expressionAttributeNames['#longitude'] = 'Longitude';
-      expressionAttributeValues[':longitude'] = { S: location.longitude };
+      expressionAttributeValues[':longitude'] = { S: location.Longitude };
     }
     updateExpression = updateExpression.substring(0, updateExpression.length-1);  // remove trailing comma
     const cmd: UpdateItemCommand = new UpdateItemCommand({
@@ -176,6 +192,21 @@ export class LocationRepository implements ReadAll<LocationItem>, ReadOne<string
   }
 
   public async delete(id: string): Promise<boolean> {
+    const cmd: DeleteItemCommand = new DeleteItemCommand({
+      TableName: this.tableName,
+      Key: {
+        Id: { S: id }
+      }
+    });
+
+    log.debug('DeleteItemCommand', { input: JSON.stringify(cmd.input) }, { tableName: cmd.input.TableName});
+    const response: DeleteItemCommandOutput = await this.client.send(cmd);
+    log.debug('DeleteItemCommandOutput', JSON.stringify(response));
+
+    if (response.$metadata.httpStatusCode !== 200) {
+      return false;
+    }
+
     return true;
   }
 }

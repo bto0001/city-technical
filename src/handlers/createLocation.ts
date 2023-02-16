@@ -11,7 +11,7 @@ import { Logger } from '@aws-lambda-powertools/logger';
 
 import { CoordinatesRepository } from '../repositories/CoordinatesRepository';
 import { envVars } from '../environmentVars';
-import { CreateLocationRequest } from '../models/locationRequests';
+import { LocationRequest } from '../models/LocationRequest';
 import { LocationRepository } from '../repositories/LocationRepository';
 import { LocationService } from '../LocationService';
 
@@ -42,7 +42,7 @@ export const handler: APIGatewayProxyHandler = async (
     log.addContext(context);
     log.debug('creating a location', JSON.stringify(event));
 
-    const location: CreateLocationRequest = JSON.parse(event.body || '');
+    const location: LocationRequest = JSON.parse(event.body || '');
 
     const result = await service.createLocation(location);
 

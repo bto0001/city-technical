@@ -167,7 +167,7 @@ export class StatelessStack extends cdk.Stack {
     table.grantReadData(getLocationLambda);
 
     table.grantWriteData(createLocationLambda);
-    table.grantWriteData(updateLocationLambda);
+    table.grantReadWriteData(updateLocationLambda);
 
     // CF Outputs
     this.apiEndpointUrl = new cdk.CfnOutput(this, 'ApiEndpointOutput', {
