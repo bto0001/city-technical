@@ -1,5 +1,16 @@
 # City Technical API
 
+## Deployment
+
+1. Create a GitHub access token that will be used to run the pipeline
+2. Create a secret in Secrets Manager, using the name: `dev/city-technical-location-api/pipeline/github-access-token`
+3. Create an AWS profile credentials file
+4. If using an AWS profile other than "default", set the `AWS_PROFILE` environment variable
+5. Execute the following:
+```bash
+npm run deploy:dev
+```
+
 ## Design Considerations
 
 ### API Design
@@ -42,7 +53,7 @@ City, State, and Country values will be parsed from the openstreetmap.org call a
 - Consider using Edge Optimized endpoints for geographically distributed clients
 - Configure WAF to protect the endpoints
 - Consider using a DI library
-- Create pipelines for other environments (test, pre-prod, prod) in separate accounts
+- Create pipelines for other environments (test, pre-prod, prod) in separate accounts, including a separate account for the pipeline itself
 - Add metrics and tracing
 - Consider adding a milddleware layer, specifically for error handling
 - Add in a linter
