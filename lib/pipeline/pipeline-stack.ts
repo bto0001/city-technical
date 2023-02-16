@@ -28,9 +28,9 @@ export class PipelineStack extends cdk.Stack {
       })
     });
 
-    new PipelineStage(this, `Develop-${environments.dev.stageName}`, {
+    pipeline.addStage(new PipelineStage(this, `Develop-${environments.dev.stageName}`, {
       ...environments.dev
-    });
+    }));
 
     // qa deploy
     // const qaStage: PipelineStage = new PipelineStage(this, 'QA', {
