@@ -50,7 +50,7 @@ I decided to use the route 'locations/' as the main route, using the HTTP verbs 
 - GET   - locations/: retrieve all locations
 - GET   - locations/{id}: retrieve one location with a given id
 - POST  - locations/: create a new location
-- PATCH - locations/{id}: update a location with a given id in the path parameter. Currently, this API only allows for location name, latitude, and longitude to be overwritten. I misread the instructions and realize now that I should've accepted location name, city, state, and country, instead of allowing for latitude an longitude. To prevent duplication, I would need to have this endpoint see if the location id exists, if it does, and the city, state, and/or country properties have been changed, then I need to call the coordinates api for the new lat/long and store that in the Location table. I would also need to delete the previous location id, as it would no longer be valid.
+- PATCH - locations/{id}: update a location with a given id in the path parameter. When an update call is made, first we query the ddb table to see if the location exists. If it does exist, we check to see if any value is different than what's stored. If either city, state, or country are different, then another call is made to the openstreemap.org api and the latitude and longitude are retrieved. Since the old Paritition key is no longer valid, we delete the existing entry and create a new entry with the new partition key and values.
 
 Perhaps a more DDD approach would've been to create separate endpoints, for example:
 
