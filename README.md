@@ -5,8 +5,8 @@ I took heavy inspiration from https://medium.com/@leejamesgilmore/serverless-aws
 ## Deployment
 
 1. Create a GitHub access token that will be used to run the pipeline
-2. Create a secret in Secrets Manager, using the name: `dev/city-technical-location-api/pipeline/github-access-token`
-3. Create an AWS profile credentials file
+2. Create a secret in Secrets Manager, using the name: `city-technical-location-api/pipeline/github-access-token`
+3. Create an AWS profile credentials file, if one does not already exist
 4. If using an AWS profile other than "default", set the `AWS_PROFILE` environment variable
 5. Ensure you have the correct version of Node installed. See `./.npmrc`.
 6. Use nvm to set your Node version to the project's Node version:
