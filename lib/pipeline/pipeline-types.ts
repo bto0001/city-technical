@@ -28,7 +28,7 @@ export const enum Stage {
 }
 
 export const enum Account {
-  qa = '245348667868',
+  qa = '111111111111',
   staging = '222222222222',
   prod = '333333333333'
 }
