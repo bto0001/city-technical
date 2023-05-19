@@ -1,9 +1,9 @@
 import axios, { AxiosInstance } from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
-import { Coordinates } from '../../src/models/Coordinates';
-import { CoordinatesRepository } from "../../src/repositories/CoordinatesRepository";
-import { StreetMapRequest } from '../../src/models/StreetMapRequest';
+import { Coordinates } from '../../../src/models/Coordinates';
+import { CoordinatesRepository } from "../../../src/repositories/CoordinatesRepository";
+import { StreetMapRequest } from '../../../src/models/StreetMapRequest';
 
 // Create axios mock client
 const axiosMocker = new MockAdapter(axios);

@@ -26,7 +26,7 @@ export class LocationService {
       throw new Error('Coordinates not found');
     }
 
-    const [ city, _, state, country ] = parseLocationDisplayName(coordinates.display_name);
+    const [ city, , state, country ] = parseLocationDisplayName(coordinates.display_name);
 
     const locationItem: LocationItem = {
       Id: createLocationId(city, state, country),
@@ -75,7 +75,7 @@ export class LocationService {
         throw new Error('coordinates not found');
       }
 
-      const [ pkCity, _, pkState, pkCountry ] = parseLocationDisplayName(coords.display_name);
+      const [ pkCity, , pkState, pkCountry ] = parseLocationDisplayName(coords.display_name);
 
       const newId = createLocationId(pkCity, pkState, pkCountry);
 
