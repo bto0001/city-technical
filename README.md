@@ -2,6 +2,10 @@
 
 I took heavy inspiration from https://medium.com/@leejamesgilmore/serverless-aws-cdk-pipeline-best-practices-patterns-part-1-ab80962f109d
 
+## Diagram
+
+![image](./docs/images/CityTechnicalArchitecture.png)
+
 ## Deployment
 
 1. Create a GitHub access token that will be used to run the pipeline
