@@ -7,15 +7,13 @@ import {
 import axios, { AxiosInstance } from 'axios';
 import * as https from 'https';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { Logger } from '@aws-lambda-powertools/logger';
 
 import { CoordinatesRepository } from '../repositories/CoordinatesRepository';
 import { envVars } from '../environmentVars';
 import { LocationRepository } from '../repositories/LocationRepository';
 import { LocationService } from '../LocationService';
 import { LocationRequest } from '../models/LocationRequest';
-
-const log = new Logger();
+import { log, middleware, tracer } from '../config/middleware';
 
 const axiosClient: AxiosInstance = axios.create({
   baseURL: envVars.OPENSTEETMAP_URL,
@@ -23,6 +21,7 @@ const axiosClient: AxiosInstance = axios.create({
 });
 
 const ddbClient: DynamoDBClient = new DynamoDBClient({});
+tracer.captureAWSv3Client(ddbClient);
 
 const service: LocationService = new LocationService(
   new CoordinatesRepository(
@@ -34,14 +33,11 @@ const service: LocationService = new LocationService(
   )
 );
 
-export const handler: APIGatewayProxyHandler = async (
+const lambdaHandler: APIGatewayProxyHandler = async (
   event: APIGatewayEvent,
-  context: Context
+  _: Context
 ): Promise<APIGatewayProxyResult> => {
   try {
-    log.addContext(context);
-    log.debug('updating a location', JSON.stringify(event));
-
     const locationId = event.pathParameters?.id;
 
     const location: Partial<LocationRequest> = JSON.parse(event.body || '');
@@ -68,7 +64,12 @@ export const handler: APIGatewayProxyHandler = async (
     }
 
   } catch (error: any) {
-    log.error(error);
-    throw error;
+    log.error('error updating a location', error as Error);
+    return {
+      statusCode: 500,
+      body: 'unable to update location',
+    };
   }
 };
+
+export const handler = middleware(lambdaHandler);

@@ -7,7 +7,7 @@ import { environments } from '../lib/pipeline/pipeline-config';
 
 const app = new cdk.App();
 new PipelineStack(app, 'CityTechnical', {
-    env: environments.dev.env
+  env: environments.dev.env
 });
 
 app.synth();

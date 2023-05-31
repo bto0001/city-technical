@@ -7,15 +7,13 @@ import {
 import axios, { AxiosInstance } from 'axios';
 import * as https from 'https';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { Logger } from '@aws-lambda-powertools/logger';
 
 import { CoordinatesRepository } from '../repositories/CoordinatesRepository';
 import { envVars } from '../environmentVars';
 import { LocationRequest } from '../models/LocationRequest';
 import { LocationRepository } from '../repositories/LocationRepository';
 import { LocationService } from '../LocationService';
-
-const log = new Logger();
+import { log, middleware, metrics, MetricUnits, tracer } from '../config/middleware';
 
 const axiosClient: AxiosInstance = axios.create({
   baseURL: envVars.OPENSTEETMAP_URL,
@@ -23,6 +21,8 @@ const axiosClient: AxiosInstance = axios.create({
 })
 
 const ddbClient: DynamoDBClient = new DynamoDBClient({});
+
+tracer.captureAWSv3Client(ddbClient);
 
 const service: LocationService = new LocationService(
   new CoordinatesRepository(
@@ -34,19 +34,17 @@ const service: LocationService = new LocationService(
   )
 );
 
-export const handler: APIGatewayProxyHandler = async (
+const lambdaHandler: APIGatewayProxyHandler = async (
   event: APIGatewayEvent,
-  context: Context
+  _: Context
 ): Promise<APIGatewayProxyResult> => {
   try {
-    log.addContext(context);
-    log.debug('creating a location', JSON.stringify(event));
-
     const location: LocationRequest = JSON.parse(event.body || '');
 
     const result = await service.createLocation(location);
 
     if (result) {
+      metrics.addMetric('locationCreated', MetricUnits.Count, 1);
       return {
         statusCode: 201,
         body: JSON.stringify(result),
@@ -59,7 +57,15 @@ export const handler: APIGatewayProxyHandler = async (
     }
 
   } catch (error: any) {
-    log.error(error);
-    throw error;
+    metrics.addDimension('error', 'locationCreated');
+    metrics.addMetric('errorLocationCreated', MetricUnits.Count, 1);
+    log.error('error creating location', error as Error);
+
+    return {
+      statusCode: 500,
+      body: 'not created',
+    };
   }
 };
+
+export const handler = middleware(lambdaHandler);

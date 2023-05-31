@@ -20,7 +20,9 @@ export class PipelineStage extends cdk.Stage {
       openStreetMapsUrl: props.stateless.openStreetmapsUrl,
       lambdaMemorySize: props.stateless.lambdaMemorySize,
       stageName: props.stageName,
-      logLevel: props.stateless.logLevel
+      logLevel: props.stateless.logLevel,
+      logEvent: props.stateless.logEvent,
+      tracing: props.stateless.tracing
     });
 
     this.apiEndpointUrl = statelessStack.apiEndpointUrl;

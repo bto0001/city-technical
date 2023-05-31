@@ -1,3 +1,5 @@
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+
 export interface EnvironmentConfig {
   env: {
     account: string;
@@ -12,6 +14,7 @@ export interface EnvironmentConfig {
     logLevel: string;
     logEvent: boolean;
     openStreetmapsUrl: string;
+    tracing: lambda.Tracing;
   }
 }
 

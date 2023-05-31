@@ -12,6 +12,8 @@ export interface StatelessStackProps extends cdk.StackProps {
   stageName: string;
   lambdaMemorySize: number;
   logLevel: string;
+  tracing: lambda.Tracing;
+  logEvent: boolean;
 }
 
 export class StatelessStack extends cdk.Stack {
@@ -21,9 +23,11 @@ export class StatelessStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: StatelessStackProps) {
     super(scope, id, props);
 
+    const metricsNamespace = 'CityTechnical';
     const { table, stageName } = props;
 
-    const projectRoute: string = path.resolve(__dirname, '..', '..', '..');  // not the most elegant code
+    // const projectRoute: string = path.resolve(__dirname, '..', '..', '..');  // not the most elegant code
+    const projectRoute: string = path.resolve(__dirname, '../../..');
 
     // create rest api
     const locationsApi: apigw.RestApi = new apigw.RestApi(this, 'LocationsApi', {
@@ -57,7 +61,8 @@ export class StatelessStack extends cdk.Stack {
         // Used by AWS Lambda Powertools
         LOG_LEVEL: props.logLevel,
         POWERTOOLS_SERVICE_NAME: 'HealthCheckLambda'
-      }
+      },
+      tracing: props.tracing
     });
 
     const createLocationLambda: nodeLambda.NodejsFunction = new nodeLambda.NodejsFunction(this, 'CreateLocationLambda', {
@@ -74,9 +79,11 @@ export class StatelessStack extends cdk.Stack {
         LOCATION_TABLE_NAME: table.tableName,
         OPENSTEETMAP_URL: props.openStreetMapsUrl,
         POWERTOOLS_SERVICE_NAME: 'CreateLocationLambda',
-        POWERTOOLS_LOGGER_LOG_EVENT: 'true',
+        POWERTOOLS_METRICS_NAMESPACE: metricsNamespace,
+        POWERTOOLS_LOGGER_LOG_EVENT: props.logEvent.toString(),
         LOG_LEVEL: props.logLevel
-      }
+      },
+      tracing: props.tracing
     });
 
     const getAllLocationsLambda: nodeLambda.NodejsFunction = new nodeLambda.NodejsFunction(this, 'GetAllLocationsLambda', {
@@ -93,9 +100,11 @@ export class StatelessStack extends cdk.Stack {
         LOCATION_TABLE_NAME: table.tableName,
         OPENSTEETMAP_URL: props.openStreetMapsUrl,
         POWERTOOLS_SERVICE_NAME: 'GetAllLocationsLambda',
-        POWERTOOLS_LOGGER_LOG_EVENT: 'true',
+        POWERTOOLS_METRICS_NAMESPACE: metricsNamespace,
+        POWERTOOLS_LOGGER_LOG_EVENT: props.logEvent.toString(),
         LOG_LEVEL: props.logLevel
-      }
+      },
+      tracing: props.tracing
     });
 
     const getLocationLambda: nodeLambda.NodejsFunction = new nodeLambda.NodejsFunction(this, 'GetLocationLambda', {
@@ -112,9 +121,11 @@ export class StatelessStack extends cdk.Stack {
         LOCATION_TABLE_NAME: table.tableName,
         OPENSTEETMAP_URL: props.openStreetMapsUrl,
         POWERTOOLS_SERVICE_NAME: 'GetLocationLambda',
-        POWERTOOLS_LOGGER_LOG_EVENT: 'true',
+        POWERTOOLS_METRICS_NAMESPACE: metricsNamespace,
+        POWERTOOLS_LOGGER_LOG_EVENT: props.logEvent.toString(),
         LOG_LEVEL: props.logLevel
-      }
+      },
+      tracing: props.tracing
     });
 
     const updateLocationLambda: nodeLambda.NodejsFunction = new nodeLambda.NodejsFunction(this, 'UpdateLocationLambda', {
@@ -131,9 +142,11 @@ export class StatelessStack extends cdk.Stack {
         LOCATION_TABLE_NAME: table.tableName,
         OPENSTEETMAP_URL: props.openStreetMapsUrl,
         POWERTOOLS_SERVICE_NAME: 'UpdateLocationLambda',
-        POWERTOOLS_LOGGER_LOG_EVENT: 'true',
+        POWERTOOLS_METRICS_NAMESPACE: metricsNamespace,
+        POWERTOOLS_LOGGER_LOG_EVENT: props.logEvent.toString(),
         LOG_LEVEL: props.logLevel
       },
+      tracing: props.tracing
     });
 
     // connect lambdas with api gateway

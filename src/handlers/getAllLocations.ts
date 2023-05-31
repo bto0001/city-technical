@@ -1,20 +1,17 @@
 import {
   APIGatewayEvent,
   APIGatewayProxyHandler,
-  APIGatewayProxyResult,
-  Context
+  APIGatewayProxyResult
 } from 'aws-lambda';
 import axios, { AxiosInstance } from 'axios';
 import * as https from 'https';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { Logger } from '@aws-lambda-powertools/logger';
 
 import { CoordinatesRepository } from '../repositories/CoordinatesRepository';
 import { envVars } from '../environmentVars';
 import { LocationRepository } from '../repositories/LocationRepository';
 import { LocationService } from '../LocationService';
-
-const log = new Logger();
+import { log, middleware, tracer } from '../config/middleware';
 
 // Axios isn't needed in this Lambda.
 const axiosClient: AxiosInstance = axios.create({
@@ -23,6 +20,7 @@ const axiosClient: AxiosInstance = axios.create({
 });
 
 const ddbClient: DynamoDBClient = new DynamoDBClient({});
+tracer.captureAWSv3Client(ddbClient);
 
 const service: LocationService = new LocationService(
   new CoordinatesRepository(
@@ -34,21 +32,23 @@ const service: LocationService = new LocationService(
   )
 );
 
-export const handler: APIGatewayProxyHandler = async (
-  event: APIGatewayEvent,
-  context: Context
+const lambdaHandler: APIGatewayProxyHandler = async (
+  _: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
   try {
-    log.addContext(context);
-    log.debug('retrieving all locations', JSON.stringify(event));
-
     return {
       statusCode: 200,
       body: JSON.stringify(await service.getAllLocations())
     };
 
   } catch (error: any) {
-    log.error(error);
-    throw error;
+    log.error('error retrieving all locations', error as Error);
+
+    return {
+      statusCode: 500,
+      body: 'server error',
+    };
   }
 };
+
+export const handler = middleware(lambdaHandler);

@@ -2,20 +2,13 @@ import {
   APIGatewayEvent,
   APIGatewayProxyHandler,
   APIGatewayProxyResult,
-  Context
 } from 'aws-lambda';
-import { Logger } from '@aws-lambda-powertools/logger';
+import { log, middleware } from '../config/middleware';
 
-const log = new Logger();
-
-export const handler: APIGatewayProxyHandler = async (
-  _: APIGatewayEvent,
-  context: Context
+const lambdaHandler: APIGatewayProxyHandler = async (
+  _: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
   try {
-    log.addContext(context);
-
-    log.debug('inside healthCheck');
     return {
       statusCode: 200,
       body: 'success',
@@ -25,3 +18,5 @@ export const handler: APIGatewayProxyHandler = async (
     throw error;
   }
 };
+
+export const handler = middleware(lambdaHandler);

@@ -7,8 +7,6 @@ import { CoordinatesRepository } from './repositories/CoordinatesRepository';
 import { LocationRepository } from "./repositories/LocationRepository";
 import { createLocationId, parseLocationDisplayName } from './utils';
 
-const log = new Logger();
-
 export class LocationService {
   constructor(
     private readonly coordinatesRepo: CoordinatesRepository,

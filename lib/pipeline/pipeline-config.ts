@@ -1,3 +1,4 @@
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as dotenv from 'dotenv';
 
 import {
@@ -27,7 +28,8 @@ export const environments: Record<Stage, EnvironmentConfig> = {
       lambdaMemorySize: parseInt(process.env.LAMBDA_MEMORY_SIZE || '128'),
       logLevel: process.env.LOG_LEVEL || 'DEBUG',
       logEvent: true,
-      openStreetmapsUrl: openStreetmapsUrl
+      openStreetmapsUrl: openStreetmapsUrl,
+      tracing: lambda.Tracing.ACTIVE
     }
   },
   [Stage.qa]: {
@@ -43,7 +45,8 @@ export const environments: Record<Stage, EnvironmentConfig> = {
       lambdaMemorySize: 256,
       logLevel: 'DEBUG',
       logEvent: true,
-      openStreetmapsUrl: openStreetmapsUrl
+      openStreetmapsUrl: openStreetmapsUrl,
+      tracing: lambda.Tracing.ACTIVE
     }
   },
   [Stage.staging]: {
@@ -59,7 +62,8 @@ export const environments: Record<Stage, EnvironmentConfig> = {
       lambdaMemorySize: 512,
       logLevel: 'INFO',
       logEvent: false,
-      openStreetmapsUrl: openStreetmapsUrl
+      openStreetmapsUrl: openStreetmapsUrl,
+      tracing: lambda.Tracing.ACTIVE
     }
   },
   [Stage.prod]: {
@@ -75,7 +79,8 @@ export const environments: Record<Stage, EnvironmentConfig> = {
       lambdaMemorySize: 1024,
       logLevel: 'WARN',
       logEvent: false,
-      openStreetmapsUrl: openStreetmapsUrl
+      openStreetmapsUrl: openStreetmapsUrl,
+      tracing: lambda.Tracing.ACTIVE
     }
   }
 }

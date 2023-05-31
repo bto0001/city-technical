@@ -4,8 +4,7 @@ import { Logger } from '@aws-lambda-powertools/logger';
 import { Coordinates } from '../models/Coordinates';
 import { ReadOne } from './interfaces/ReadOne';
 import { StreetMapRequest } from '../models/StreetMapRequest';
-
-const log = new Logger();
+import { log } from '../config/middleware';
 
 export class CoordinatesRepository implements ReadOne<StreetMapRequest, Coordinates> {
   constructor(private client: AxiosInstance) {}
@@ -20,9 +19,9 @@ export class CoordinatesRepository implements ReadOne<StreetMapRequest, Coordina
     const { data } = await this.client.get<Coordinates[]>('/search', {
       params: params
     });
-    log.debug(`${this.client.getUri()} call complete`, { data: JSON.stringify(data) });
+    log.debug(`${this.client.getUri()} call complete`, { data });
 
-    if (!data) {
+    if (!data || data.length === 0) {
       return null;
     }
 

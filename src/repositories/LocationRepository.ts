@@ -12,14 +12,12 @@ import {
   UpdateItemCommand,
   UpdateItemCommandOutput
 } from '@aws-sdk/client-dynamodb';
-import { Logger } from '@aws-lambda-powertools/logger';
 
 import { LocationItem } from '../models/LocationItem';
 import { ReadAll } from './interfaces/ReadAll';
 import { ReadOne } from './interfaces/ReadOne';
 import { Write } from './interfaces/Write';
-
-const log = new Logger();
+import { log } from '../config/middleware';
 
 export class LocationRepository implements ReadAll<LocationItem>, ReadOne<string, LocationItem>, Write<LocationItem> {
   constructor(
@@ -32,9 +30,9 @@ export class LocationRepository implements ReadAll<LocationItem>, ReadOne<string
       TableName: this.tableName
     });
 
-    log.debug('ScanCommand', { input: JSON.stringify(cmd.input) }, { tableName: cmd.input.TableName});
+    log.debug('ScanCommand', { input: cmd.input });
     const response: ScanCommandOutput = await this.client.send(cmd);
-    log.debug('ScanCommandOutput', JSON.stringify(response));
+    log.debug('ScanCommandOutput', { output: response });
 
     if (!response.Items) {
       return [];
@@ -87,9 +85,9 @@ export class LocationRepository implements ReadAll<LocationItem>, ReadOne<string
       }
     });
 
-    log.debug('PutItemCommand', { input: JSON.stringify(cmd.input) }, { tableName: cmd.input.TableName, Key: JSON.stringify(cmd.input.Item)});
+    log.debug('PutItemCommand', { input: cmd.input });
     const response: PutItemCommandOutput = await this.client.send(cmd);
-    log.debug('PutItemCommandOutput', JSON.stringify(response));
+    log.debug('PutItemCommandOutput', { output: response });
 
     if (response.$metadata.httpStatusCode === 200) {
       return location;
@@ -104,10 +102,10 @@ export class LocationRepository implements ReadAll<LocationItem>, ReadOne<string
       Key: { Id: { S: id }}
     });
 
-    log.debug('GetItemCommand', { input: JSON.stringify(cmd.input) }, { tableName: cmd.input.TableName, Key: JSON.stringify(cmd.input.Key)});
+    log.debug('GetItemCommand', { input: cmd.input });
     const response: GetItemCommandOutput = await this.client.send(cmd);
     const item: Record<string, AttributeValue> | undefined = response.Item;
-    log.debug('GetItemCommandOutput', JSON.stringify(response));
+    log.debug('GetItemCommandOutput', { output: response });
 
     if (!item) {
       return {} as LocationItem;
@@ -173,9 +171,9 @@ export class LocationRepository implements ReadAll<LocationItem>, ReadOne<string
       ReturnValues: 'ALL_NEW'
     });
 
-    log.debug('UpdateItemCommand', { input: JSON.stringify(cmd.input) }, { tableName: cmd.input.TableName, Key: JSON.stringify(cmd.input.Key)});
+    log.debug('UpdateItemCommand', { input: cmd.input });
     const response: UpdateItemCommandOutput = await this.client.send(cmd);
-    log.debug('UpdateItemCommandOutput', JSON.stringify(response));
+    log.debug('UpdateItemCommandOutput', { output: response });
 
     if (response.$metadata.httpStatusCode === 200) {
       return {
@@ -199,9 +197,9 @@ export class LocationRepository implements ReadAll<LocationItem>, ReadOne<string
       }
     });
 
-    log.debug('DeleteItemCommand', { input: JSON.stringify(cmd.input) }, { tableName: cmd.input.TableName});
+    log.debug('DeleteItemCommand', { input: cmd.input });
     const response: DeleteItemCommandOutput = await this.client.send(cmd);
-    log.debug('DeleteItemCommandOutput', JSON.stringify(response));
+    log.debug('DeleteItemCommandOutput', { output: response });
 
     if (response.$metadata.httpStatusCode !== 200) {
       return false;
