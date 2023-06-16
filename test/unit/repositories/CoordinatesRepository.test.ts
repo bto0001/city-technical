@@ -17,7 +17,7 @@ const repo: CoordinatesRepository = new CoordinatesRepository(
 
 describe('CoordinatesRepository', () => {
   test('test retrieve coordinates', async () => {
-    // GIVEN
+    // ARRANGE
     const mockCoordinates: Coordinates = {
       display_name: 'Gardendale, Jefferson County, Alabama, USA',
       lat: '33',
@@ -30,10 +30,10 @@ describe('CoordinatesRepository', () => {
     };
     axiosMocker.onGet('/search').reply(200, [mockCoordinates]);
 
-    // WHEN
+    // ACT
     const result = await repo.get(streetMapRequest);
 
-    // THEN
+    // ASSERT
     expect(axiosMocker.history.get).toHaveLength(1);
     expect(result).toEqual(mockCoordinates);
   });
